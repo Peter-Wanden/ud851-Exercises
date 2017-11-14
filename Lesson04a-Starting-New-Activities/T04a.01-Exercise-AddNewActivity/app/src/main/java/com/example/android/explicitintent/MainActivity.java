@@ -53,15 +53,16 @@ public class MainActivity extends AppCompatActivity {
              */
             @Override
             public void onClick(View v) {
+
                 /*
                  * Storing the Context in a variable in this case is redundant since we could have
                  * just used "this" or "MainActivity.this" in the method call below. However, we
                  * wanted to demonstrate what parameter we were using "MainActivity.this" for as
                  * clear as possible.
                  */
+
                 // Grab the context
                 Context context = MainActivity.this;
-
                 // Store ChildActivity.class in a Class object called destinationActivity
                 Class destinationActivity = ChildActivity.class;
                 // Create an intent to start ChildActivity
