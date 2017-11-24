@@ -83,19 +83,19 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
 
-        int valueOfKey = 0;
+//        int valueOfKey = key.getItemId();
 
-        if (key.equals(getString(R.string.pref_show_bass_key))) {
-            valueOfKey = getResources().getIdentifier("pref_show_bass_key", "string", getPackageName());
+//        if (key.equals(getString(R.string.pref_show_bass_key))) {
+//            valueOfKey = getResources().getIdentifier("pref_show_bass_key", "string", getPackageName());
+//
+//        } else if (key.equals(getString(R.string.pref_show_mid_key))) {
+//            valueOfKey = getResources().getIdentifier("pref_show_mid_key", "string", getPackageName());
+//
+//        } else if (key.equals(getString(R.string.pref_show_treb_key))) {
+//            valueOfKey = getResources().getIdentifier("pref_show_treb_key", "string", getPackageName());
+//        }
 
-        } else if (key.equals(getString(R.string.pref_show_mid_key))) {
-            valueOfKey = getResources().getIdentifier("pref_show_mid_key", "string", getPackageName());
-
-        } else if (key.equals(getString(R.string.pref_show_treb_key))) {
-            valueOfKey = getResources().getIdentifier("pref_show_treb_key", "string", getPackageName());
-        }
-
-        switch (valueOfKey) {
+        switch (sharedPreferences.getInt(key, 0)) {
 
             case R.string.pref_show_bass_key:
                 mVisualizerView.setShowBass(sharedPreferences.
@@ -111,6 +111,7 @@ public class VisualizerActivity extends AppCompatActivity implements SharedPrefe
                 mVisualizerView.setShowTreble(sharedPreferences.
                         getBoolean(key, getResources().getBoolean(R.bool.pref_show_treb_default)));
                 break;
+
         }
     }
 
