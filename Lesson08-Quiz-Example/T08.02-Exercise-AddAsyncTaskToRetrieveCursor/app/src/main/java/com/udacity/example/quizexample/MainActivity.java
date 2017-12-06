@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private int mCurrentState;
     // TODO (3) Create an instance variable storing a Cursor called mData
     private Cursor mData;
+
     private Button mButton;
 
     @Override
