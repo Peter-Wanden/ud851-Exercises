@@ -140,7 +140,28 @@ public class TaskContentProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
-            // Handle any exceptions
+
+            // Case for single row
+            case TASK_WITH_ID:
+                // Using selection and selectionArgs
+                // pathSegment 0 is the path 'TASKS', segment 1 is the id
+                String id = uri.getPathSegments().get(1);
+
+                String mSelection = "_id=?";
+                String[] mSelectionArgs = new String[]{id};
+
+                cursor = db.query(TABLE_NAME,
+                        projection,
+                        mSelection,
+                        mSelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+
+
+
+
+                // Handle any exceptions
             default:
                 throw new UnsupportedOperationException("Unknown uri " + uri);
         }

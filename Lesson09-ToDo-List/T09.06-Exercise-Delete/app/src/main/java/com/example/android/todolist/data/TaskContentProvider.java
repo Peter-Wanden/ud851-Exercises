@@ -26,6 +26,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import static android.provider.BaseColumns._ID;
 import static com.example.android.todolist.data.TaskContract.TaskEntry.TABLE_NAME;
 
 // Verify that TaskContentProvider extends from ContentProvider and implements required methods
@@ -41,6 +42,9 @@ public class TaskContentProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     // Define a static buildUriMatcher method that associates URI's with their int match
+    // Member variable for a TaskDbHelper that's initialized in the onCreate() method
+    private TaskDbHelper mTaskDbHelper;
+
     /**
      Initialize a new matcher object without any matches,
      then use .addURI(String authority, String path, int match) to add matches
@@ -60,9 +64,6 @@ public class TaskContentProvider extends ContentProvider {
 
         return uriMatcher;
     }
-
-    // Member variable for a TaskDbHelper that's initialized in the onCreate() method
-    private TaskDbHelper mTaskDbHelper;
 
     /* onCreate() is where you should initialize anything you’ll need to setup
     your underlying data source.
@@ -157,13 +158,33 @@ public class TaskContentProvider extends ContentProvider {
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
 
         // TODO (1) Get access to the database and write URI matching code to recognize a single item
+        final SQLiteDatabase db = mTaskDbHelper.getWritableDatabase();
+
+        // Track the number of rows deleted
+        int rowsDeleted;
 
         // TODO (2) Write the code to delete a single row of data
         // [Hint] Use selections to delete an item by its row ID
+        final int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case TASK_WITH_ID:
+                // Delete a single row given the Id in the Uri
+                selection = _ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                rowsDeleted = db.delete(TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Deletion is not supported for " + uri);
+        }
 
         // TODO (3) Notify the resolver of a change and return the number of items deleted
-
-        throw new UnsupportedOperationException("Not yet implemented");
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        // Return the number of rows deleted. In this case it will always be one as we have
+        // not implemented multiple row delete as yet.
+        return rowsDeleted;
     }
 
 
