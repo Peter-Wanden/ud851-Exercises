@@ -41,6 +41,9 @@ public class TaskContentProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
 
     // Define a static buildUriMatcher method that associates URI's with their int match
+    // Member variable for a TaskDbHelper that's initialized in the onCreate() method
+    private TaskDbHelper mTaskDbHelper;
+
     /**
      Initialize a new matcher object without any matches,
      then use .addURI(String authority, String path, int match) to add matches
@@ -60,9 +63,6 @@ public class TaskContentProvider extends ContentProvider {
 
         return uriMatcher;
     }
-
-    // Member variable for a TaskDbHelper that's initialized in the onCreate() method
-    private TaskDbHelper mTaskDbHelper;
 
     /* onCreate() is where you should initialize anything you’ll need to setup
     your underlying data source.
@@ -191,15 +191,53 @@ public class TaskContentProvider extends ContentProvider {
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection,
                       String[] selectionArgs) {
+        //Keep track of if an update occurs
+        int tasksUpdated;
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        // match code
+        int match = sUriMatcher.match(uri);
+
+        switch (match) {
+            case TASK_WITH_ID:
+                //update a single task by getting the id
+                String id = uri.getPathSegments().get(1);
+                //using selections
+                tasksUpdated = mTaskDbHelper.getWritableDatabase().update(TABLE_NAME, values, "_id=?", new String[]{id});
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        if (tasksUpdated != 0) {
+            //set notifications if a task was updated
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+        // return number of tasks updated
+        return tasksUpdated;
     }
 
-
+    /* getType() handles requests for the MIME type of data
+    We are working with two types of data:
+    1) a directory and 2) a single row of data.
+    This method will not be used in our app, but gives a way to standardize the data formats
+    that your provider accesses, and this can be useful for data organization.
+    For now, this method will not be used but will be provided for completeness.
+     */
     @Override
     public String getType(@NonNull Uri uri) {
+        int match = sUriMatcher.match(uri);
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        switch (match) {
+            case TASKS:
+                // directory
+                return "vnd.android.cursor.dir" + "/" + TaskContract.AUTHORITY + "/" + TaskContract.PATH_TASKS;
+            case TASK_WITH_ID:
+                // single item type
+                return "vnd.android.cursor.item" + "/" + TaskContract.AUTHORITY + "/" + TaskContract.PATH_TASKS;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
     }
 
 }
