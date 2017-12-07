@@ -27,7 +27,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
+
+import static com.example.android.todolist.data.TaskContract.TaskEntry.COLUMN_PRIORITY;
+import static com.example.android.todolist.data.TaskContract.TaskEntry.CONTENT_URI;
 
 
 public class MainActivity extends AppCompatActivity implements
@@ -37,11 +41,9 @@ public class MainActivity extends AppCompatActivity implements
     // Constants for logging and referring to a unique loader
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TASK_LOADER_ID = 0;
-
+    RecyclerView mRecyclerView;
     // Member variables for the adapter and RecyclerView
     private CustomCursorAdapter mAdapter;
-    RecyclerView mRecyclerView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,8 +150,17 @@ public class MainActivity extends AppCompatActivity implements
 
                 // TODO (5) Query and load all task data in the background; sort by priority
                 // [Hint] use a try/catch block to catch any errors in loading data
-
-                return null;
+                try {
+                    return getContentResolver().query(CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            COLUMN_PRIORITY);
+                } catch (Exception e) {
+                    Log.e(TAG, "failed to asynchronously load data.");
+                    e.printStackTrace();
+                    return null;
+                }
             }
 
             // deliverResult sends the result of the load, a Cursor, to the registered listener
@@ -158,7 +169,6 @@ public class MainActivity extends AppCompatActivity implements
                 super.deliverResult(data);
             }
         };
-
     }
 
 
