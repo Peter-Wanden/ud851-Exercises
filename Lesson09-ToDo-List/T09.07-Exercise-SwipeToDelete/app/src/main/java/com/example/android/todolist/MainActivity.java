@@ -18,6 +18,7 @@ package com.example.android.todolist;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -32,6 +33,8 @@ import android.view.View;
 
 import com.example.android.todolist.data.TaskContract;
 
+import static com.example.android.todolist.data.TaskContract.TaskEntry.CONTENT_URI;
+
 
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -40,11 +43,9 @@ public class MainActivity extends AppCompatActivity implements
     // Constants for logging and referring to a unique loader
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int TASK_LOADER_ID = 0;
-
+    RecyclerView mRecyclerView;
     // Member variables for the adapter and RecyclerView
     private CustomCursorAdapter mAdapter;
-    RecyclerView mRecyclerView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,9 +82,23 @@ public class MainActivity extends AppCompatActivity implements
                 // TODO (1) Construct the URI for the item to delete
                 //[Hint] Use getTag (from the adapter code) to get the id of the swiped item
 
+                // Get the id
+                int id = (int) viewHolder.itemView.getTag();
+                // convert it to a string
+                String stringId = Integer.toString(id);
+                // Start the Uri
+                Uri uri = CONTENT_URI;
+                // stick the id on the end
+                uri = uri.buildUpon().appendPath(stringId).build();
+
+                Log.i(TAG, "Uri to delete: " + uri);
+
                 // TODO (2) Delete a single row of data using a ContentResolver
+                getContentResolver().delete(uri, null, null);
 
                 // TODO (3) Restart the loader to re-query for all tasks after a deletion
+                getSupportLoaderManager().
+                        restartLoader(TASK_LOADER_ID, null, MainActivity.this);
                 
             }
         }).attachToRecyclerView(mRecyclerView);
@@ -161,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements
                 // [Hint] use a try/catch block to catch any errors in loading data
 
                 try {
-                    return getContentResolver().query(TaskContract.TaskEntry.CONTENT_URI,
+                    return getContentResolver().query(CONTENT_URI,
                             null,
                             null,
                             null,
