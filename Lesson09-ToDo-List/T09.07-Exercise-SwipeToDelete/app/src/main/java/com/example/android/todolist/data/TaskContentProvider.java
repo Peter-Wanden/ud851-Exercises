@@ -26,6 +26,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
+import static com.example.android.todolist.data.TaskContract.AUTHORITY;
+import static com.example.android.todolist.data.TaskContract.PATH_TASKS;
 import static com.example.android.todolist.data.TaskContract.TaskEntry.TABLE_NAME;
 
 // Verify that TaskContentProvider extends from ContentProvider and implements required methods
@@ -58,8 +60,8 @@ public class TaskContentProvider extends ContentProvider {
           For each kind of uri you may want to access, add the corresponding match with addURI.
           The two calls below add matches for the task directory and a single item by ID.
          */
-        uriMatcher.addURI(TaskContract.AUTHORITY, TaskContract.PATH_TASKS, TASKS);
-        uriMatcher.addURI(TaskContract.AUTHORITY, TaskContract.PATH_TASKS + "/#", TASK_WITH_ID);
+        uriMatcher.addURI(AUTHORITY, PATH_TASKS, TASKS);
+        uriMatcher.addURI(AUTHORITY, PATH_TASKS + "/#", TASK_WITH_ID);
 
         return uriMatcher;
     }
@@ -231,10 +233,10 @@ public class TaskContentProvider extends ContentProvider {
         switch (match) {
             case TASKS:
                 // directory
-                return "vnd.android.cursor.dir" + "/" + TaskContract.AUTHORITY + "/" + TaskContract.PATH_TASKS;
+                return "vnd.android.cursor.dir" + "/" + AUTHORITY + "/" + PATH_TASKS;
             case TASK_WITH_ID:
                 // single item type
-                return "vnd.android.cursor.item" + "/" + TaskContract.AUTHORITY + "/" + TaskContract.PATH_TASKS;
+                return "vnd.android.cursor.item" + "/" + AUTHORITY + "/" + PATH_TASKS;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
